@@ -6,7 +6,7 @@
  */
 
 /**
- * Image Style module functions.
+ * Moderation addon functions.
  */
 $this->module('moderation')->extend([
 
@@ -14,10 +14,12 @@ $this->module('moderation')->extend([
     $revisons = array_reverse($revisions);
 
     foreach ($revisions as $revision) {
+
       // If we have an Unpublished version before draft entry is ignored.
       if ($revision['data']['status'] === 'Unpublished') {
         return FALSE;
       }
+
       // If we have at least one Published revision.
       // And we don't have an unpublished one before we return the entry.
       if ($revision['data']['status'] === 'Published') {
@@ -60,7 +62,7 @@ $this->module('moderation')->extend([
 
 // Incldude admin.
 if (COCKPIT_ADMIN && !COCKPIT_API_REQUEST) {
- include_once __DIR__ . '/admin.php';
+  include_once __DIR__ . '/admin.php';
 }
 
 // Include actions.
