@@ -10,19 +10,19 @@
  */
 $this->module('moderation')->extend([
 
-  'getLastPublished' => function ($id, array $revisions = []) {
+  'getLastPublished' => function ($id, $moderation_field, array $revisions = []) {
     $revisons = array_reverse($revisions);
 
     foreach ($revisions as $revision) {
 
       // If we have an Unpublished version before draft entry is ignored.
-      if ($revision['data']['status'] === 'Unpublished') {
+      if ($revision['data'][$moderation_field] === 'Unpublished') {
         return FALSE;
       }
 
       // If we have at least one Published revision.
       // And we don't have an unpublished one before we return the entry.
-      if ($revision['data']['status'] === 'Published') {
+      if ($revision['data'][$moderation_field] === 'Published') {
         return $revision['data'];
       }
     }
@@ -39,12 +39,12 @@ $this->module('moderation')->extend([
     return FALSE;
   },
 
-  'isEnabled' => function($name) {
+  'getModerationField' => function($name) {
     $collection = $this->app->module('collections')->collection($name);
     if ($collection && !empty($collection['fields'])) {
       foreach ($collection['fields'] as $field) {
         if ($field['type'] === 'moderation') {
-          return TRUE;
+          return $field['name'];
         }
       }
     }
