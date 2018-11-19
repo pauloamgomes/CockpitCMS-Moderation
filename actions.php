@@ -62,4 +62,6 @@ $app->on('collections.find.after', function ($name, &$entries) use ($app) {
       unset($entries[$idx][$moderation_field]);
     }
   }
+  // Rebuild array indices.
+  $entries = array_values($entries);
 });
