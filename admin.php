@@ -31,4 +31,3 @@ $this->on('cockpit.view.settings.item', function () use ($app) {
      $this->renderView("moderation:views/partials/settings.php");
   }
 });
-

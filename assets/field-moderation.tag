@@ -10,7 +10,7 @@
 
     this.on('mount', function() {
       if (document.querySelector('.uk-moderation-element')) {
-        this.parent.root.closest(".uk-width-medium-1-1").style.display = "none";
+        document.querySelector('.field-moderation-field').closest(".uk-panel").parentNode.classList.add('uk-hidden');
       }
       this.update();
     });
