@@ -1,0 +1,26 @@
+.uk-moderation-element .uk-badge {
+  min-width: 90px;
+  text-align: left;
+  padding: 6px 8px;
+}
+.uk-moderation-list {
+  width: auto;
+  max-width: 80px;
+}
+.uk-moderation-list .uk-badge {
+  font-size: 8px;
+  padding: 2px 6px;
+  border-radius: 2px;
+}
+.uk-moderation-Unpublished .uk-badge {
+  background-color: #d85030;
+  color: #ffffff;
+}
+.uk-moderation-Draft .uk-badge {
+  background-color: #e28327;
+  color: #ffffff !important;
+}
+.uk-moderation-Published .uk-badge {
+  background-color: #659f13;
+  color: #ffffff !important;
+}

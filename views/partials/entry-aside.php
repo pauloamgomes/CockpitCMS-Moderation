@@ -1,23 +1,3 @@
-<style>
-.uk-moderation-element .uk-badge {
-  min-width: 90px;
-  text-align: left;
-  padding: 6px 8px;
-}
-.uk-moderation-Unpublished .uk-badge {
-  background-color: #d85030;
-  color: #ffffff;
-}
-.uk-moderation-Draft .uk-badge {
-  background-color: #e28327;
-  color: #ffffff !important;
-}
-.uk-moderation-Published .uk-badge {
-  background-color: #659f13;
-  color: #ffffff !important;
-}
-</style>
-
 <div class="uk-margin moderation-status" if="{field && field.length && moderation_field}">
   <div class="uk-width-1-1 uk-form-select uk-moderation-element uk-moderation-{ entry[moderation_field] }">
     <label class="uk-text-small">@lang('Moderation Status:')</label>

@@ -18,7 +18,8 @@ $this->on('collections.entry.aside', function() {
 $app->on('admin.init', function () {
   // Add field tag.
   $this->helper('admin')->addAssets('moderation:assets/field-moderation.tag');
-
+  $this->helper('admin')->addAssets('moderation:assets/moderation.css');
+  $this->helper('admin')->addAssets('moderation:assets/moderation.js');
   // Bind admin routes.
   $this->bindClass('Moderation\\Controller\\Admin', 'settings/moderation');
 });
