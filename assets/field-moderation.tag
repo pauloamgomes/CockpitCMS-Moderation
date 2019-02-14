@@ -9,8 +9,8 @@
     var $this = this;
 
     this.on('mount', function() {
-      if (document.querySelector('.uk-moderation-element')) {
-        document.querySelector('.field-moderation-field').closest(".uk-panel").parentNode.classList.add('uk-hidden');
+      if (document.querySelector('.field-moderation-field')) {
+        document.querySelector('.field-moderation-field').closest(".uk-width-medium-1-1").classList.add('uk-hidden');
       }
       this.update();
     });

@@ -36,7 +36,7 @@
     $this.entry[$this.moderation_field] = $this.entry[$this.moderation_field] || 'Draft';
 
     window.setTimeout(function() {
-      sidebar = document.querySelector('.uk-grid-margin.uk-flex-order-first');
+      sidebar = document.querySelector('.uk-width-medium-1-4.uk-flex-order-first');
       sidebar.insertBefore(document.querySelector('.moderation-status'), sidebar.childNodes[0]);
     }, 50);
 
