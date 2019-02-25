@@ -10,7 +10,8 @@
 
     this.on('mount', function() {
       if (document.querySelector('.field-moderation-field')) {
-        document.querySelector('.field-moderation-field').closest(".uk-width-medium-1-1").classList.add('uk-hidden');
+        selector = document.querySelector('.field-moderation-field').closest(".uk-width-medium-1-1");
+        selector && selector.classList.add('uk-hidden');
       }
       this.update();
     });
