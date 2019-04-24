@@ -8,15 +8,14 @@
  * Exclude unpublished entries.
  */
 $app->on('collections.find.before', function ($name, &$options) use ($app) {
+
   // Get the collection.
   $collection = $this->module('collections')->collection($name);
   // Exclude on unpublished state.
   foreach ($collection['fields'] as $field) {
     if ($field['type'] === 'moderation') {
-      $options['filter']['$and'] = [
-         ["{$field['name']}" => ['$exists' => TRUE]],
-         ["{$field['name']}" => ['$ne' => 'Unpublished']],
-      ];
+      $options['filter']['$and'][] = ["{$field['name']}" => ['$exists' => TRUE]];
+      $options['filter']['$and'][] = ["{$field['name']}" => ['$ne' => 'Unpublished']];
       break;
     }
   }
