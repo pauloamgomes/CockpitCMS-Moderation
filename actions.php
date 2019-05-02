@@ -11,6 +11,7 @@ $app->on('collections.find.before', function ($name, &$options) use ($app) {
 
   // Get the collection.
   $collection = $this->module('collections')->collection($name);
+
   // Exclude on unpublished state.
   foreach ($collection['fields'] as $field) {
     if ($field['type'] === 'moderation') {
@@ -19,6 +20,8 @@ $app->on('collections.find.before', function ($name, &$options) use ($app) {
       break;
     }
   }
+  // Extend filters to other addons.
+  $app->trigger("moderation.find.before", [$name, &$options]);
 });
 
 /**
