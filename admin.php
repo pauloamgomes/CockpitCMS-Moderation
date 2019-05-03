@@ -32,3 +32,12 @@ $this->on('cockpit.view.settings.item', function () use ($app) {
      $this->renderView("moderation:views/partials/settings.php");
   }
 });
+
+/**
+ * Provide modififications on the preview url (Helpers addon).
+ */
+$this->on('helpers.preview.url', function(&$preview) use ($app) {
+  $keys = $app->module('cockpit')->loadApiKeys();
+  $preview['token'] = $keys['moderation'] ?? '';
+});
+
