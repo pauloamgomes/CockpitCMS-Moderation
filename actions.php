@@ -52,6 +52,9 @@ $app->on('collections.find.after', function ($name, &$entries) use ($app) {
       $revisions = $app->helper('revisions')->getList($entry['_id']);
       $published = $app->module('moderation')->getLastPublished($entry['_id'], $moderation_field, $revisions);
       if ($published) {
+        $published = [$published];
+        $populated = cockpit_populate_collection($published, 1);
+        $published = current($published);
         $entries[$idx] = $published;
       }
       else {
