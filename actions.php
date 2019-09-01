@@ -52,10 +52,7 @@ $app->on('collections.find.after', function ($name, &$entries) use ($app) {
       $revisions = $app->helper('revisions')->getList($entry['_id']);
       $published = $app->module('moderation')->getLastPublished($entry['_id'], $moderation_field, $revisions);
       if ($published) {
-        $published = [$published];
-        $populated = cockpit_populate_collection($published, 1);
-        $published = current($published);
-        $entries[$idx] = $published;
+        $entries[$idx] = array_merge($entry, array_intersect_key($published, $entry));
       }
       else {
         unset($entries[$idx]);
@@ -73,5 +70,16 @@ $app->on('collections.find.after', function ($name, &$entries) use ($app) {
 
 // Ensure that status is included in the fields.
 $app->on('moderation.find.before', function($name, &$options) {
-  $options['fields']['status'] = 1;
+  $collection = $this->module('collections')->collection($name);
+  $name = FALSE;
+  foreach ($collection['fields'] as $field) {
+    if ($field['type'] === 'moderation') {
+      $name = $field['name'];
+      break;
+    }
+  }
+
+  if ($name) {
+    $options['fields'][$name] = 1;
+  }
 });
