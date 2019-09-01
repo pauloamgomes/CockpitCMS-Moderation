@@ -70,3 +70,8 @@ $app->on('collections.find.after', function ($name, &$entries) use ($app) {
   // Rebuild array indices.
   $entries = array_values($entries);
 });
+
+// Ensure that status is included in the fields.
+$app->on('moderation.find.before', function($name, &$options) {
+  $options['fields']['status'] = 1;
+});
