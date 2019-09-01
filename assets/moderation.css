@@ -24,3 +24,12 @@
   background-color: #659f13;
   color: #ffffff !important;
 }
+.icon-Unpublished {
+  color: #d85030;
+}
+.icon-Published {
+  color: #659f13;
+}
+.icon-Draft {
+  color: #e28327;
+}
