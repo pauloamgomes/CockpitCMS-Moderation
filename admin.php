@@ -3,6 +3,8 @@
 // Module ACL definitions.
 $this("acl")->addResource('moderation', [
   'manage',
+  'publish',
+  'unpublish'
 ]);
 
 /**
@@ -15,7 +17,16 @@ $this->on('collections.entry.aside', function() {
 /**
  * Initialize addon for admin pages.
  */
-$app->on('admin.init', function () {
+$app->on('admin.init', function () use ($app)  {
+  // Check moderation capabilities for the user.
+  $canPublish = $app->module('cockpit')->hasaccess('moderation', ['manage', 'publish']);
+  $canUnpublish = $app->module('cockpit')->hasaccess('moderation', ['manage', 'unpublish']);
+
+  $this('admin')->data["extract/moderation"] = [
+    'canPublish' => $canPublish,
+    'canUnpublish' => $canUnpublish,
+  ];
+
   // Add field tag.
   $this->helper('admin')->addAssets('moderation:assets/field-moderation.tag');
   $this->helper('admin')->addAssets('moderation:assets/moderation.css');

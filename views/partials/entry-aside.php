@@ -10,9 +10,9 @@
       </span>
     </div>
     <select bind="entry.{moderation_field}">
-      <option selected="{ entry[moderation_field] === 'Unpublished' }" value="Unpublished">@lang('Unpublished')</option>
-      <option selected="{ entry[moderation_field] === 'Draft' }" value="Draft">@lang('Draft')</option>
-      <option selected="{ entry[moderation_field] === 'Published' }" value="Published">@lang('Published')</option>
+      <option if="{ canUnpublish }" selected="{ entry[moderation_field] === 'Unpublished' }" value="Unpublished">@lang("Unpublished")</option>
+      <option selected="{ entry[moderation_field] === 'Draft' }" value="Draft">@lang("Draft")</option>
+      <option if="{ canPublish }" selected="{ entry[moderation_field] === 'Published' }" value="Published">@lang("Published")</option>
     </select>
   </div>
 </div>
@@ -20,6 +20,8 @@
 <script>
   var $this = this;
   $this.moderation_field = 'status';
+  $this.canPublish = {{ $app->module("cockpit")->hasaccess('moderation', ['manage', 'publish']) ? 1 : 0 }};
+  $this.canUnpublish = {{ $app->module("cockpit")->hasaccess('moderation', ['manage', 'unpublish']) ? 1 : 0 }};
 
   this.on('mount', function() {
 
@@ -34,6 +36,9 @@
     $this.moderation_field = $this.field[0].name;
 
     $this.entry[$this.moderation_field] = $this.entry[$this.moderation_field] || 'Draft';
+    if (!$this.canPublish && $this.entry[$this.moderation_field] === 'Published') {
+      $this.entry[$this.moderation_field] = 'Draft';
+    }
 
     window.setTimeout(function() {
       sidebar = document.querySelector('.uk-width-medium-1-4.uk-flex-order-first');

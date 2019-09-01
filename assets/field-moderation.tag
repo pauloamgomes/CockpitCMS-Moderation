@@ -1,11 +1,11 @@
 <field-moderation class="field-moderation-field">
   <select ref="input" bind="{ opts.bind }">
-    <option selected="{ parent.root.$value === opts.bind.value }" value="Unpublished">Unpublished</option>
+    <option if="{App.$data.moderation.canPublish}" selected="{ parent.root.$value === opts.bind.value }" value="Unpublished">Unpublished</option>
     <option selected="{ parent.root.$value === opts.bind.value }" value="Draft">Draft</option>
-    <option selected="{ parent.root.$value === opts.bind.value }" value="Published">Published</option>
+    <option if="{App.$data.moderation.canUnpublish}" selected="{ parent.root.$value === opts.bind.value }" value="Published">Published</option>
   </select>
-  <script>
 
+  <script>
     var $this = this;
 
     this.on('mount', function() {

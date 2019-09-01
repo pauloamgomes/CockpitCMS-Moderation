@@ -25,7 +25,28 @@ http://your-cockpit-site/api/collections/get/<name>?token=<api-key>&previewToken
 
 ### Permissions
 
-There is only one permission (manage) that can be used to manage addon settings page.
+The following permissions (ACL's) are defined:
+
+* **manage** - access to all moderation states and addons settings page
+* **publish** - can change entries to Published state
+* **unpublish** - can change entries to Unpublished state
+
+Example of configuration for 3 groups of editors where `editor` can only create/update entries to `Draft` state, `approver` can create/update `Draft` and move to `Published` state, and finally `manager` can publish and unpublish entries.
+
+```yaml
+groups:
+  editor:
+  approver:
+    moderation:
+      publish: true
+  manager:
+    moderation:
+      publish: true
+      unpublish: true
+```
+
+By default admins have super access, any other groups that have not the permissions specificed in the configuration, can only create/edit
+entries only in Draft mode.
 
 ## Usage
 
