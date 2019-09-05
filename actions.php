@@ -11,16 +11,24 @@ $app->on('collections.find.before', function ($name, &$options) use ($app) {
 
   // Get the collection.
   $collection = $this->module('collections')->collection($name);
-
   // Exclude on unpublished state.
   foreach ($collection['fields'] as $field) {
     if ($field['type'] === 'moderation') {
+      $field_name = $field['name'];
       $options['filter']['$and'][] = ["{$field['name']}" => ['$exists' => TRUE]];
       $options['filter']['$and'][] = ["{$field['name']}" => ['$ne' => 'Unpublished']];
       break;
     }
   }
-  // Extend filters to other addons.
+
+  if (!isset($field_name)) {
+    return;
+  }
+
+  if (!empty($options['fields'])) {
+    $options['fields'][$field_name] = 1;
+  }
+
   $app->trigger("moderation.find.before", [$name, &$options]);
 });
 
@@ -52,34 +60,18 @@ $app->on('collections.find.after', function ($name, &$entries) use ($app) {
       $revisions = $app->helper('revisions')->getList($entry['_id']);
       $published = $app->module('moderation')->getLastPublished($entry['_id'], $moderation_field, $revisions);
       if ($published) {
-        $entries[$idx] = array_merge($entry, array_intersect_key($published, $entry));
+        $published = array_merge($entry, array_intersect_key($published, $entry));
+        $published = [$published];
+        $populated = cockpit_populate_collection($published, 1);
+        $published = current($populated);
+        $entries[$idx] = $published;
       }
       else {
         unset($entries[$idx]);
       }
-    }
-
-    // Remove moderation field from the answer.
-    if (isset($entries[$idx][$moderation_field])) {
-      unset($entries[$idx][$moderation_field]);
     }
   }
   // Rebuild array indices.
   $entries = array_values($entries);
 });
 
-// Ensure that status is included in the fields.
-$app->on('moderation.find.before', function($name, &$options) {
-  $collection = $this->module('collections')->collection($name);
-  $name = FALSE;
-  foreach ($collection['fields'] as $field) {
-    if ($field['type'] === 'moderation') {
-      $name = $field['name'];
-      break;
-    }
-  }
-
-  if ($name) {
-    $options['fields'][$name] = 1;
-  }
-});
