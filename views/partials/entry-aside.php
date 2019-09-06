@@ -8,7 +8,7 @@
     </label>
     <div class="uk-margin-small-top">
       <span class="uk-badge uk-badge-outline">
-        @lang("Change to:") <strong>@lang("{entry[moderation_field]}")</strong>
+        {originalModeration !== entry[moderation_field] ? App.i18n.get("Change to:") : App.i18n.get("Save as:")} <strong>@lang("{entry[moderation_field]}")</strong>
       </span>
     </div>
     <select bind="entry.{moderation_field}">
@@ -26,8 +26,18 @@
   $this.canPublish = {{ $app->module("cockpit")->hasaccess('moderation', ['manage', 'publish']) ? 1 : 0 }};
   $this.canUnpublish = {{ $app->module("cockpit")->hasaccess('moderation', ['manage', 'unpublish']) ? 1 : 0 }};
 
-  this.on('mount', function() {
+  var oldXHROpen = window.XMLHttpRequest.prototype.open;
+  window.XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
+   if (/^.*(\/collections\/save_entry\/\w+)$/.test(url)) {
+     this.addEventListener('load', function() {
+      var entry = JSON.parse(this.responseText);
+      $this.originalModeration = entry[$this.moderation_field];
+     });
+   }
+   return oldXHROpen.apply(this, arguments);
+  }
 
+  this.on('mount', function() {
     $this.field = this.collection.fields.filter(function(definition) {
       return definition.type === 'moderation';
     });
@@ -48,5 +58,6 @@
 
     $this.update();
   });
+
 
 </script>
