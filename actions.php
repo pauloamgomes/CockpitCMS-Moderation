@@ -15,8 +15,12 @@ $app->on('collections.find.before', function ($name, &$options) use ($app) {
   foreach ($collection['fields'] as $field) {
     if ($field['type'] === 'moderation') {
       $field_name = $field['name'];
-      $options['filter']['$and'][] = ["{$field['name']}" => ['$exists' => TRUE]];
-      $options['filter']['$and'][] = ["{$field['name']}" => ['$ne' => 'Unpublished']];
+      if ($field['localize'] && $lang = $app->param("lang", false)) {
+        $field_name .= "_$lang";
+      }
+
+      $options['filter']['$and'][] = [$field_name => ['$exists' => TRUE]];
+      $options['filter']['$and'][] = [$field_name => ['$ne' => 'Unpublished']];
       break;
     }
   }
@@ -56,10 +60,18 @@ $app->on('collections.find.after', function ($name, &$entries) use ($app) {
     }
 
     // If Draft ensure we retrieve the latest published revision.
+    // Please note that the entry being checked has already been thru lang filtering.
     if ($entry[$moderation_field] == 'Draft') {
       $revisions = $app->helper('revisions')->getList($entry['_id']);
+
+      if ($lang = $app->param('lang', false)) {
+          $moderation_field .= "_$lang";
+      }
+      // However, this has not been filtered:
       $published = $app->module('moderation')->getLastPublished($entry['_id'], $moderation_field, $revisions);
+
       if ($published) {
+        $published = $app->module('moderation')->removeLangSuffix($name, $published, $lang);
         $published = array_merge($entry, array_intersect_key($published, $entry));
         $published = [$published];
         $populated = cockpit_populate_collection($published, 1);
@@ -74,4 +86,3 @@ $app->on('collections.find.after', function ($name, &$entries) use ($app) {
   // Rebuild array indices.
   $entries = array_values($entries);
 });
-
