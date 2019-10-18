@@ -14,13 +14,13 @@ $app->on('collections.find.before', function ($name, &$options) use ($app) {
   // Exclude on unpublished state.
   foreach ($collection['fields'] as $field) {
     if ($field['type'] === 'moderation') {
-      $field_name = $field['name'];
+      $field_name = $field_name_lang = $field['name'];
       if ($field['localize'] && $lang = $app->param("lang", false)) {
-        $field_name .= "_$lang";
+        $field_name_lang .= "_{$lang}";
       }
 
-      $options['filter']['$and'][] = [$field_name => ['$exists' => TRUE]];
-      $options['filter']['$and'][] = [$field_name => ['$ne' => 'Unpublished']];
+      $options['filter']['$and'][] = [$field_name_lang => ['$exists' => TRUE]];
+      $options['filter']['$and'][] = [$field_name_lang => ['$ne' => 'Unpublished']];
       break;
     }
   }
@@ -29,6 +29,7 @@ $app->on('collections.find.before', function ($name, &$options) use ($app) {
     return;
   }
 
+  // If we are using filter/fields we need to use original field name.
   if (!empty($options['fields'])) {
     $options['fields'][$field_name] = 1;
   }
@@ -49,10 +50,15 @@ $app->on('collections.find.after', function ($name, &$entries) use ($app) {
   }
 
   // Get the moderation field.
-  $moderation_field = $app->module('moderation')->getModerationField($name);
-  if (!$moderation_field) {
+  $field = $app->module('moderation')->getModerationField($name);
+
+  if (!$field) {
     return;
   }
+
+  $lang = $app->param('lang', FALSE);
+  $moderation_field = $field['name'];
+  $localize = $field['localize'] ?? FALSE;
 
   foreach ($entries as $idx => $entry) {
     if (!isset($entry[$moderation_field])) {
@@ -64,8 +70,8 @@ $app->on('collections.find.after', function ($name, &$entries) use ($app) {
     if ($entry[$moderation_field] == 'Draft') {
       $revisions = $app->helper('revisions')->getList($entry['_id']);
 
-      if ($lang = $app->param('lang', false)) {
-          $moderation_field .= "_$lang";
+      if ($lang && $localize) {
+        $moderation_field .= "_{$lang}";
       }
       // However, this has not been filtered:
       $published = $app->module('moderation')->getLastPublished($entry['_id'], $moderation_field, $revisions);

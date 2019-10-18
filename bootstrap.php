@@ -44,7 +44,7 @@ $this->module('moderation')->extend([
     if ($collection && !empty($collection['fields'])) {
       foreach ($collection['fields'] as $field) {
         if ($field['type'] === 'moderation') {
-          return $field['name'];
+          return $field;
         }
       }
     }
