@@ -74,6 +74,46 @@ $this->module('moderation')->extend([
     }
     return $entry;
   },
+
+  'setSchedule' => function($data) {
+    $id = $data['id'];
+    $lang = $data['lang'] ?? "";
+
+    $user = $this->app->module('cockpit')->getUser();
+
+    $existing = $this->app->storage->findOne('moderation/schedule', ['_oid' => $id, 'lang' => $lang]);
+
+    $entry = [
+      '_oid' => trim($id),
+      'schedule' => $data['schedule'],
+      '_lang' => trim($data['lang']),
+      '_creator' => $user['_id'] ?? NULL,
+      '_modified' => time()
+    ];
+
+    if ($existing) {
+      $entry['_id'] = $existing['_id'];
+      $this->app->storage->save('moderation/schedule', $entry);
+    }
+    else {
+      $this->app->storage->insert('moderation/schedule', $entry);
+    }
+
+    return $entry;
+  },
+
+  'getSchedule' => function($data) {
+    $id = $data['id'];
+    $lang = $data['lang'];
+    return $this->app->storage->findOne('moderation/schedule', ['_oid' => $id, '_lang' => $lang]);
+  },
+
+  'removeSchedule' => function($data) {
+    $id = $data['id'];
+    $lang = $data['lang'];
+    return $this->app->storage->remove('moderation/schedule', ['_oid' => $id, '_lang' => $lang]);
+  },
+
 ]);
 
 // Incldude admin.

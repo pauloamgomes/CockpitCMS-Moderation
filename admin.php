@@ -4,14 +4,19 @@
 $this("acl")->addResource('moderation', [
   'manage',
   'publish',
-  'unpublish'
+  'unpublish',
+  'schedule',
 ]);
 
 /**
  * Add moderation markup to collections sidebar.
  */
-$this->on('collections.entry.aside', function() {
-  $this->renderView("moderation:views/partials/entry-aside.php");
+$this->on('collections.entry.aside', function($name) use ($app) {
+  $canSchedule = $app->module('cockpit')->hasaccess('moderation', ['manage', 'schedule']);
+  $settings = $this->retrieve('config/moderation', ['schedule' => []]);
+  $scheduleEnabled = $canSchedule && ($settings['schedule'] === '*' || in_array($name, $settings['schedule']));
+
+  $this->renderView("moderation:views/partials/entry-aside.php", ['enabled' => $scheduleEnabled]);
 });
 
 /**
