@@ -1,3 +1,20 @@
+.with-schedule {
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.schedule-container {
+  min-height: 250px;
+}
+
+.schedule-container .uk-dropdown-scrollable {
+  position: fixed;
+}
+
+.schedule-container .schedule-time {
+  position: relative;
+}
+
 .uk-moderation-element .uk-badge {
   min-width: 90px;
   text-align: left;
