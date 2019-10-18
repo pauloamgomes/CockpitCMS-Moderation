@@ -58,6 +58,22 @@ $this->module('moderation')->extend([
     return ['success' => $this->app->module('cockpit')->saveApiKeys($keys)];
   },
 
+  'removeLangSuffix' => function($name, $entry, $lang) {
+    if ($lang) {
+      $collection = $this->app->module('collections')->collection($name);
+      foreach ($collection['fields'] as $field) {
+        if($field['localize']) {
+          $fieldName = $field['name'];
+          $suffixedFieldName = $fieldName."_$lang";
+          $entry[$fieldName] = $entry[$suffixedFieldName];
+          if (isset($entry["{$suffixedFieldName}_slug"])) {
+            $entry["{$fieldName}_slug"] = $entry["{$suffixedFieldName}_slug"];
+          }
+        }
+      }
+    }
+    return $entry;
+  },
 ]);
 
 // Incldude admin.
