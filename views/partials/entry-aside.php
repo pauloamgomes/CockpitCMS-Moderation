@@ -6,7 +6,7 @@
             <span>@lang('Configure the scheduling moderation status and the date/time.')</span>
           </div>
           <div class="schedule-container">
-              <div class="uk-margin-top" if="{ lang }">
+              <div class="uk-margin-top" if="{ localize && lang }">
                   <div class="uk-flex-item-1">
                     <label class="uk-text-small">@lang('Language:')</label><br />
                     <span>{ getLangLabel(lang) }</span>
@@ -138,9 +138,6 @@
         }
       }
     }
-    $this.moderation_field = $this.field[0].name;
-    $this.originalModeration = $this.entry[$this.moderation_field] || 'Draft';
-    $this.entry[$this.moderation_field] = 'Draft';
 
     window.setTimeout(function() {
       sidebar = document.querySelector('.uk-width-medium-1-4.uk-flex-order-first');
@@ -161,21 +158,22 @@
     $this.moderation_field = moderation_field();
   });
 
-  function moderation_field() {
-    return $this.localize && $this.lang
-      ? $this.moderation_field_name + "_" + $this.lang
-      : $this.moderation_field_name;
-  }
   this.on('bindingupdated', function(data) {
     if (this.entry._id && this.canSchedule && data[0] && data[0] === 'lang') {
       this.getSchedule();
     }
   });
 
+  function moderation_field() {
+    return $this.localize && $this.lang
+      ? $this.moderation_field_name + "_" + $this.lang
+      : $this.moderation_field_name;
+  }
+
   this.getSchedule = function() {
     var filter = {
       id: this.entry._id,
-      lang: this.lang || ""
+      lang: (this.localize && this.lang) || ""
     };
     App.callmodule('moderation:getSchedule', filter, 'schedule').then(function(data) {
       $this.schedule = (data.result && data.result.schedule) || null;
@@ -193,7 +191,9 @@
     var schedule = {
       id: this.entry._id,
       schedule: this.schedule,
-      lang: this.lang || ""
+      field: this.moderation_field_name,
+      collection: this.collection.name,
+      lang: (this.localize && this.lang) || ""
     };
     App.callmodule('moderation:setSchedule',  schedule, 'schedule').then(function(data) {
       App.ui.notify('Schedule: entry will be <strong>' + $this.schedule.type + "</strong> on <strong>" + $this.schedule.date + " " + $this.schedule.time + '</strong>', 'success');
@@ -238,7 +238,7 @@
 
   this.scheduleDateIsValid = function() {
     var sdate = moment($this.schedule.date + " " + $this.schedule.time);
-    return sdate.isAfter(moment(), 'hour');
+    return sdate.isAfter(moment(), 'minute');
   }
 
   this.getLangLabel = function(code) {

@@ -75,7 +75,7 @@ $this->module('moderation')->extend([
     return $entry;
   },
 
-  'setSchedule' => function($data) {
+  'setSchedule' => function(array $data) {
     $id = $data['id'];
     $lang = $data['lang'] ?? "";
 
@@ -86,6 +86,8 @@ $this->module('moderation')->extend([
     $entry = [
       '_oid' => trim($id),
       'schedule' => $data['schedule'],
+      '_field' => $data['field'],
+      '_collection' => $data['collection'],
       '_lang' => trim($data['lang']),
       '_creator' => $user['_id'] ?? NULL,
       '_modified' => time()
@@ -102,13 +104,12 @@ $this->module('moderation')->extend([
     return $entry;
   },
 
-  'getSchedule' => function($data) {
-    $id = $data['id'];
-    $lang = $data['lang'];
-    return $this->app->storage->findOne('moderation/schedule', ['_oid' => $id, '_lang' => $lang]);
+  'getSchedule' => function(array $data) {
+    $filter = ['_oid' => $data['id'], '_lang' => $data['lang']];
+    return $this->app->storage->findOne('moderation/schedule', $filter);
   },
 
-  'removeSchedule' => function($data) {
+  'removeSchedule' => function(array $data) {
     $id = $data['id'];
     $lang = $data['lang'];
     return $this->app->storage->remove('moderation/schedule', ['_oid' => $id, '_lang' => $lang]);
@@ -125,4 +126,7 @@ if (COCKPIT_ADMIN && !COCKPIT_API_REQUEST) {
 if (COCKPIT_API_REQUEST) {
   include_once __DIR__ . '/actions.php';
   include_once __DIR__ . '/cockpitql.php';
+  $this->on('cockpit.rest.init', function ($routes) {
+    $routes['schedule'] = 'Moderation\\Controller\\RestApi';
+  });
 }
