@@ -14,7 +14,8 @@ $this("acl")->addResource('moderation', [
 $this->on('collections.entry.aside', function($name) use ($app) {
   $canSchedule = $app->module('cockpit')->hasaccess('moderation', ['manage', 'schedule']);
   $settings = $this->retrieve('config/moderation', ['schedule' => []]);
-  $scheduleEnabled = $canSchedule && ($settings['schedule'] === '*' || in_array($name, $settings['schedule']));
+
+  $scheduleEnabled = $canSchedule && isset($settings['schedule']) && ($settings['schedule'] === '*' || in_array($name, $settings['schedule']));
 
   $this->renderView("moderation:views/partials/entry-aside.php", ['enabled' => $scheduleEnabled]);
 });
