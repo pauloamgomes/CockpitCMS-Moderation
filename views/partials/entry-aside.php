@@ -81,6 +81,18 @@
       <span>{ schedule.date } { schedule.time }</span> <a class="uk-text-small uk-text-danger" onClick="{ cancelSchedulePrompt }"><i class="uk-icon-trash"></i> @lang('Cancel')</a>
     </div>
   </div>
+  <div if="{ entry._id }" class="uk-margin-small-top">
+    <label class="uk-text-small">@lang('Tasks')</label>
+    <div class="uk-text-small uk-text-muted">
+      <a class="uk-text-medium" onClick="{ showSchedule }"><i class="uk-icon-plus"></i> @lang('Create task')</a>
+    </div>
+    <div if="{ tasks }" class="uk-text-medium uk-text-muted">
+      <strong><i class="uk-icon-clock-o"></i> { schedule.type }</strong><br />
+      <span>{ schedule.date } { schedule.time }</span> <a class="uk-text-small uk-text-danger" onClick="{ cancelSchedulePrompt }"><i class="uk-icon-trash"></i> @lang('Cancel')</a>
+    </div>
+  </div>
+
+  <button onclick="{ saveAndPublish }" id="save-and-publish" class="uk-button uk-button-large uk-button-success" style="display: none;">@lang('Publish & Save')</button>
 </div>
 
 <script>
@@ -124,7 +136,7 @@
 
     $this.localize = $this.field[0].localize || false;
     $this.moderation_field_name = $this.field[0].name;
-    $this.moderation_field = moderation_field();
+    $this.moderation_field = getModerationField();
 
     $this.originalModeration[''] = $this.entry[$this.moderation_field_name] || 'Draft';
     if ($this.entry[$this.moderation_field_name] !== 'Unpublished') {
@@ -142,6 +154,9 @@
     window.setTimeout(function() {
       sidebar = document.querySelector('.uk-width-medium-1-4.uk-flex-order-first');
       sidebar.insertBefore(document.querySelector('.moderation-status'), sidebar.childNodes[0]);
+      App.$('cp-actionbar .uk-container button.uk-button-primary').attr('id', 'save-entry-button');
+      App.$('cp-actionbar .uk-container').prepend(App.$('#save-and-publish'));
+      updateActions($this.entry[$this.moderation_field]);
     }, 50);
 
     if (this.canSchedule && this.entry._id) {
@@ -155,19 +170,37 @@
   });
 
   this.on("update", function() {
-    $this.moderation_field = moderation_field();
+    $this.moderation_field = getModerationField();
+    console.log('update', $this.entry[$this.moderation_field]);
   });
 
   this.on('bindingupdated', function(data) {
     if (this.entry._id && this.canSchedule && data[0] && data[0] === 'lang') {
       this.getSchedule();
     }
+    if (this.entry._id && data[0] && data[1] && data[0] === 'entry.' + $this.moderation_field) {
+      updateActions(data[1]);
+    }
   });
 
-  function moderation_field() {
+  function getModerationField() {
     return $this.localize && $this.lang
       ? $this.moderation_field_name + "_" + $this.lang
       : $this.moderation_field_name;
+  }
+
+  function updateActions(status) {
+    App.ui.notify(App.i18n.get('Entry moderation status changed to') + ' <strong>' + status + '</strong>', 'success');
+    if (status === 'Draft') {
+      App.$('#save-and-publish').show();
+      App.$('#save-entry-button').removeClass('uk-button-danger uk-button-success').addClass('uk-button-primary').html(App.i18n.get('Save Draft')).show();
+    } else if (status === 'Published') {
+      App.$('#save-and-publish').hide();
+      App.$('#save-entry-button').removeClass('uk-button-primary uk-button-danger').addClass('uk-button-success').html(App.i18n.get('Save Published')).show();
+    } else if (status === 'Unpublished') {
+      App.$('#save-and-publish').hide();
+      App.$('#save-entry-button').removeClass('uk-button-primary uk-button-success').addClass('uk-button-danger').html(App.i18n.get('Save Unpublished')).show();
+    }
   }
 
   this.getSchedule = function() {
@@ -249,5 +282,11 @@
     }
   }
 
+  this.saveAndPublish = function(e) {
+    this.entry[$this.moderation_field] = 'Published';
+    $this.update();
+    this.submit(e);
+    return false;
+  }
 
 </script>
