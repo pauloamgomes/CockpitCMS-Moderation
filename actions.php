@@ -59,6 +59,7 @@ $app->on('collections.find.after', function ($name, &$entries) use ($app) {
   $lang = $app->param('lang', FALSE);
   $moderation_field = $field['name'];
   $localize = $field['localize'] ?? FALSE;
+  $populate = $app->param('populate', 1);
 
   foreach ($entries as $idx => $entry) {
     if (!isset($entry[$moderation_field])) {
@@ -80,7 +81,7 @@ $app->on('collections.find.after', function ($name, &$entries) use ($app) {
         $published = $app->module('moderation')->removeLangSuffix($name, $published, $lang);
         $published = array_merge($entry, array_intersect_key($published, $entry));
         $published = [$published];
-        $populated = cockpit_populate_collection($published, 1);
+        $populated = cockpit_populate_collection($published, $populate);
         $published = current($populated);
         $entries[$idx] = $published;
       }
