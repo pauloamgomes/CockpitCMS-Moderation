@@ -81,16 +81,6 @@
       <span>{ schedule.date } { schedule.time }</span> <a class="uk-text-small uk-text-danger" onClick="{ cancelSchedulePrompt }"><i class="uk-icon-trash"></i> @lang('Cancel')</a>
     </div>
   </div>
-  <div if="{ entry._id }" class="uk-margin-small-top">
-    <label class="uk-text-small">@lang('Tasks')</label>
-    <div class="uk-text-small uk-text-muted">
-      <a class="uk-text-medium" onClick="{ showSchedule }"><i class="uk-icon-plus"></i> @lang('Create task')</a>
-    </div>
-    <div if="{ tasks }" class="uk-text-medium uk-text-muted">
-      <strong><i class="uk-icon-clock-o"></i> { schedule.type }</strong><br />
-      <span>{ schedule.date } { schedule.time }</span> <a class="uk-text-small uk-text-danger" onClick="{ cancelSchedulePrompt }"><i class="uk-icon-trash"></i> @lang('Cancel')</a>
-    </div>
-  </div>
 
   <button onclick="{ saveAndPublish }" id="save-and-publish" class="uk-button uk-button-large uk-button-success" style="display: none;">@lang('Publish & Save')</button>
 </div>
