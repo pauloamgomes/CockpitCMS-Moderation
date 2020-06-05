@@ -58,11 +58,11 @@
       <i if="{originalModeration[lang] == 'Unpublished'}" class="icon-Unpublished uk-icon-circle-o"></i>
       <i if="{originalModeration[lang] == 'Draft'}" class="icon-Draft uk-icon-pencil"></i>
       <i if="{originalModeration[lang] == 'Published'}" class="icon-Published uk-icon-circle"></i>
-      <strong>@lang('Status:')</strong> {originalModeration[lang]}
+      <strong>@lang('Status:')</strong> {App.i18n.get(originalModeration[lang])}
     </label>
     <div class="uk-margin-small-top">
       <span class="uk-badge uk-badge-outline">
-        {originalModeration[lang] !== entry[moderation_field] ? App.i18n.get("Change to:") : App.i18n.get("Save as:")} <strong>@lang("{entry[moderation_field]}")</strong>
+        {originalModeration[lang] !== entry[moderation_field] ? App.i18n.get("Change to:") : App.i18n.get("Save as:")} <strong>{App.i18n.get(entry[moderation_field])}</strong>
       </span>
     </div>
     <select bind="entry.{moderation_field}">
