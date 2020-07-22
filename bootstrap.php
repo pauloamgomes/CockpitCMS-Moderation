@@ -58,17 +58,36 @@ $this->module('moderation')->extend([
     return ['success' => $this->app->module('cockpit')->saveApiKeys($keys)];
   },
 
-  'removeLangSuffix' => function($name, $entry, $lang) {
+  'removeLangSuffix' => function($name, $entry, $lang, $ignoreDefaultFallback) {
     if ($lang) {
+
       $collection = $this->app->module('collections')->collection($name);
+
       foreach ($collection['fields'] as $field) {
-        if($field['localize']) {
+
+        if ($field['localize']) {
           $fieldName = $field['name'];
           $suffixedFieldName = $fieldName."_$lang";
-          $entry[$fieldName] = $entry[$suffixedFieldName];
-          if (isset($entry["{$suffixedFieldName}_slug"])) {
-            $entry["{$fieldName}_slug"] = $entry["{$suffixedFieldName}_slug"];
-          }
+
+          if (
+            (
+              isset($entry[$suffixedFieldName]) && 
+              $entry[$suffixedFieldName] !== ''
+            ) ||
+            (
+              $ignoreDefaultFallback === true ||
+              (
+                is_array($ignoreDefaultFallback) && 
+                in_array($fieldName, $ignoreDefaultFallback)
+              )
+            )
+          ) {
+            $entry[$fieldName] = $entry[$suffixedFieldName];
+
+            if (isset($entry["{$suffixedFieldName}_slug"]) && $entry["{$suffixedFieldName}_slug"] !== '') {
+              $entry["{$fieldName}_slug"] = $entry["{$suffixedFieldName}_slug"];
+            }
+          }          
         }
       }
     }

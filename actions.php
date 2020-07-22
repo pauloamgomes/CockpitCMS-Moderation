@@ -57,6 +57,7 @@ $app->on('collections.find.after', function ($name, &$entries) use ($app) {
   }
 
   $lang = $app->param('lang', FALSE);
+  $ignoreDefaultFallback = $app->param('ignoreDefaultFallback', FALSE);
   $moderation_field = $field['name'];
   $localize = $field['localize'] ?? FALSE;
   $populate = $app->param('populate', 1);
@@ -78,7 +79,7 @@ $app->on('collections.find.after', function ($name, &$entries) use ($app) {
       $published = $app->module('moderation')->getLastPublished($entry['_id'], $moderation_field, $revisions);
 
       if ($published) {
-        $published = $app->module('moderation')->removeLangSuffix($name, $published, $lang);
+        $published = $app->module('moderation')->removeLangSuffix($name, $published, $lang, $ignoreDefaultFallback);
         $published = array_merge($entry, array_intersect_key($published, $entry));
         $published = [$published];
         $populated = cockpit_populate_collection($published, $populate);
