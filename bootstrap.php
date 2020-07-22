@@ -70,24 +70,23 @@ $this->module('moderation')->extend([
           $suffixedFieldName = $fieldName."_$lang";
 
           if (
-            (
-              isset($entry[$suffixedFieldName]) && 
-              $entry[$suffixedFieldName] !== ''
-            ) ||
-            (
-              $ignoreDefaultFallback === true ||
-              (
-                is_array($ignoreDefaultFallback) && 
-                in_array($fieldName, $ignoreDefaultFallback)
-              )
-            )
+            isset($entry[$suffixedFieldName]) && 
+            $entry[$suffixedFieldName] !== ''
           ) {
             $entry[$fieldName] = $entry[$suffixedFieldName];
 
             if (isset($entry["{$suffixedFieldName}_slug"]) && $entry["{$suffixedFieldName}_slug"] !== '') {
               $entry["{$fieldName}_slug"] = $entry["{$suffixedFieldName}_slug"];
             }
-          }          
+          } elseif (
+            $ignoreDefaultFallback === true ||
+            (
+              is_array($ignoreDefaultFallback) && 
+              in_array($fieldName, $ignoreDefaultFallback)
+            )
+          ) {
+            $entry[$fieldName] = null;
+          }   
         }
       }
     }
