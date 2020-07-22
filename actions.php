@@ -58,6 +58,9 @@ $app->on('collections.find.after', function ($name, &$entries) use ($app) {
 
   $lang = $app->param('lang', FALSE);
   $ignoreDefaultFallback = $app->param('ignoreDefaultFallback', FALSE);
+  if ($ignoreDefaultFallback = $this->param('ignoreDefaultFallback', false)) {
+    $ignoreDefaultFallback = \in_array($ignoreDefaultFallback, ['1', '0']) ? \boolval($ignoreDefaultFallback) : $ignoreDefaultFallback;
+  }
   $moderation_field = $field['name'];
   $localize = $field['localize'] ?? FALSE;
   $populate = $app->param('populate', 1);
