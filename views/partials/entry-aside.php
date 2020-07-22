@@ -276,6 +276,7 @@
     this.entry[$this.moderation_field] = 'Published';
     $this.update();
     this.submit(e);
+    updateActions(this.entry[$this.moderation_field]);
     return false;
   }
 
