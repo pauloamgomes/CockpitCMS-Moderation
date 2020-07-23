@@ -193,13 +193,31 @@
     }
   }
 
+  function utcScheduleToLocal(schedule) {
+    const date = moment.utc(`${schedule.date}T${schedule.time}`).local();
+
+    return Object.assign({}, schedule, {
+      date: date.format("YYYY-MM-DD"),
+      time: date.format("HH:mm")
+    });
+  }
+
+  function localScheduleToUtc(schedule) {
+    const date = moment(`${schedule.date}T${schedule.time}`).utc();
+
+    return Object.assign({}, schedule, {
+      date: date.format("YYYY-MM-DD"),
+      time: date.format("HH:mm")
+    });
+  }
+
   this.getSchedule = function() {
     var filter = {
       id: this.entry._id,
       lang: (this.localize && this.lang) || ""
     };
     App.callmodule('moderation:getSchedule', filter, 'schedule').then(function(data) {
-      $this.schedule = (data.result && data.result.schedule) || null;
+      $this.schedule = (data.result && utcScheduleToLocal(data.result.schedule)) || null;
       $this.update();
     }).catch(function(e){
       App.ui.notify('Error loading schedule information!', 'danger');
@@ -213,7 +231,7 @@
     }
     var schedule = {
       id: this.entry._id,
-      schedule: this.schedule,
+      schedule: localScheduleToUtc(this.schedule),
       field: this.moderation_field_name,
       collection: this.collection.name,
       lang: (this.localize && this.lang) || ""

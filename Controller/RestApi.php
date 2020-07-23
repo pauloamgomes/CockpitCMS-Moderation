@@ -26,7 +26,7 @@ class RestApi extends Controller {
     $ago = strtotime("-{$range} minutes");
     $now = time();
     foreach ($results as $result) {
-      $time = strtotime("{$result['schedule']['date']} {$result['schedule']['time']}");
+      $time = strtotime("{$result['schedule']['date']}T{$result['schedule']['time']}Z");
       if ($time < $ago) {
         $outdated[] = $result;
       }
