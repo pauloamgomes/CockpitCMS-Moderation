@@ -51,6 +51,8 @@
   </div>
 </div>
 
+{console.log(originalModeration, lang)}
+
 <div class="uk-margin moderation-status { canSchedule ? 'with-schedule' : '' }" if="{field && field.length && moderation_field}">
   <label class="uk-text-small">@lang('Moderation')</label>
   <div class="uk-width-1-1 uk-form-select uk-moderation-element uk-moderation-{ entry[moderation_field] }">
@@ -58,7 +60,7 @@
       <i if="{originalModeration[lang] == 'Unpublished'}" class="icon-Unpublished uk-icon-circle-o"></i>
       <i if="{originalModeration[lang] == 'Draft'}" class="icon-Draft uk-icon-pencil"></i>
       <i if="{originalModeration[lang] == 'Published'}" class="icon-Published uk-icon-circle"></i>
-      <strong>@lang('Status:')</strong> {App.i18n.get(originalModeration[lang])}
+      <strong>@lang('Status:')</strong> {App.i18n.get(originalModeration[""])}
     </label>
     <div class="uk-margin-small-top">
       <span class="uk-badge uk-badge-outline">
@@ -168,7 +170,6 @@
 
   this.on("update", function() {
     $this.moderation_field = getModerationField();
-    console.log('update', $this.entry[$this.moderation_field]);
   });
 
   this.on('bindingupdated', function(data) {
