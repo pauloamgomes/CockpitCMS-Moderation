@@ -120,6 +120,13 @@
       return definition.type === 'moderation';
     });
 
+    // Avoid triggering a save on enter keypress
+    App.$('cp-field input').on('keypress', function(e) {
+      if (e.keyCode === 13) {
+        e.preventDefault();
+      }
+    });
+
     if (!$this.field.length || $this.field[0].name === undefined) {
       return;
     }
