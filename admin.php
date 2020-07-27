@@ -24,9 +24,6 @@ $this->on('collections.entry.aside', function($name) use ($app) {
  * Add moderation markup to singletons sidebar.
  */
 $this->on('singletons.form.aside', function($name) use ($app) {
-  $canSchedule = $app->module('cockpit')->hasaccess('moderation', ['manage', 'schedule']);
-  $settings = $this->retrieve('config/moderation', ['schedule' => []]);
-
   $this->renderView("moderation:views/partials/singleton-aside.php");
 });
 
