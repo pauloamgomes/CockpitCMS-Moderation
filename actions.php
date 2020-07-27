@@ -38,9 +38,8 @@ $app->on('collections.find.before', function ($name, &$options) use ($app) {
 });
 
 /**
- * Exclude
+ * Manipulate singleton response depending on publish context
  */
-
 
 $app->on('singleton.getData.after', function ($singleton, &$data) use ($app) {
   $lang = $app->param('lang', FALSE);
