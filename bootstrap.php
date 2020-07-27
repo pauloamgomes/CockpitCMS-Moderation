@@ -58,12 +58,9 @@ $this->module('moderation')->extend([
     return ['success' => $this->app->module('cockpit')->saveApiKeys($keys)];
   },
 
-  'removeLangSuffix' => function($name, $entry, $lang, $ignoreDefaultFallback) {
+  'removeLangSuffix' => function($fields, $entry, $lang, $ignoreDefaultFallback) {
     if ($lang) {
-
-      $collection = $this->app->module('collections')->collection($name);
-
-      foreach ($collection['fields'] as $field) {
+      foreach ($fields as $field) {
 
         if ($field['localize']) {
           $fieldName = $field['name'];
