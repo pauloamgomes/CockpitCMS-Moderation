@@ -168,7 +168,6 @@
 
   this.on("update", function() {
     $this.moderation_field = getModerationField();
-    console.log('update', $this.entry[$this.moderation_field]);
   });
 
   this.on('bindingupdated', function(data) {
