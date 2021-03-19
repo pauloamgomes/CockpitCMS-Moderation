@@ -298,6 +298,7 @@
 
   this.saveAndPublish = function(e) {
     this.entry[$this.moderation_field] = 'Published';
+    this.entry['_publishedAt'] = +Date.now();
     $this.update();
     this.submit(e);
     updateActions(this.entry[$this.moderation_field]);
