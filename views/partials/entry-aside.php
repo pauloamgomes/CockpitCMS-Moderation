@@ -297,8 +297,10 @@
   }
 
   this.saveAndPublish = function(e) {
+    if (this.entry[$this.moderation_field] !== 'Published' && !this.entry['_publishedAt']) {
+      this.entry['_publishedAt'] = +Date.now();
+    }
     this.entry[$this.moderation_field] = 'Published';
-    this.entry['_publishedAt'] = +Date.now();
     $this.update();
     this.submit(e);
     updateActions(this.entry[$this.moderation_field]);
