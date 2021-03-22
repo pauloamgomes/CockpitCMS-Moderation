@@ -1,8 +1,13 @@
 <?php
-
 /**
- * @file
- * Cockpit Addon Bootstrap file.
+ * Cockpit moderation addon
+ *
+ * @author  Paulo Gomes
+ * @package CockpitCMS-Moderation
+ * @license MIT
+ *
+ * @source  https://github.com/pauloamgomes/CockpitCMS-Moderation
+ * @see     { README.md } for usage info.
  */
 
 /**
@@ -70,7 +75,7 @@ $this->module('moderation')->extend([
           $suffixedFieldName = $fieldName."_$lang";
 
           if (
-            isset($entry[$suffixedFieldName]) && 
+            isset($entry[$suffixedFieldName]) &&
             $entry[$suffixedFieldName] !== ''
           ) {
             $entry[$fieldName] = $entry[$suffixedFieldName];
@@ -81,12 +86,12 @@ $this->module('moderation')->extend([
           } elseif (
             $ignoreDefaultFallback === true ||
             (
-              is_array($ignoreDefaultFallback) && 
+              is_array($ignoreDefaultFallback) &&
               in_array($fieldName, $ignoreDefaultFallback)
             )
           ) {
             $entry[$fieldName] = null;
-          }   
+          }
         }
       }
     }

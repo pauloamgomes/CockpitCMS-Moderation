@@ -8,10 +8,44 @@ This addon extends Cockpit CMS core functionality by introducing the possibility
 
 ## Installation
 
-1. Confirm that you have Cockpit CMS (Next branch) installed and working.
-2. Download zip and extract to 'your-cockpit-docroot/addons' (e.g. cockpitcms/addons/Moderation, the addon folder name must be Moderation)
-3. Edit one collection and confirm that you have a new field type (Moderation).
-4. Access addon settings page (http://your-cockpit-site/settings/moderation) and confirm that page loads.
+### Manual
+
+Download [latest release](https://github.com/pauloamgomes/CockpitCMS-Moderation) and extract to `COCKPIT_PATH/addons/Moderation` directory
+
+### Git
+
+```sh
+git clone https://github.com/pauloamgomes/CockpitCMS-Moderation.git ./addons/Moderation
+```
+
+### Cockpit CLI
+
+```sh
+php ./cp install/addon --name Moderation --url https://github.com/pauloamgomes/CockpitCMS-Moderation.git
+```
+
+### Composer
+
+1. Make sure path to cockpit addons is defined in your projects' _composer.json_ file:
+
+  ```json
+  {
+      "name": "MY_PROJECT",
+      "extra": {
+          "installer-paths": {
+              "cockpit/addons/{$name}": ["type:cockpit-module"]
+          }
+      }
+  }
+  ```
+
+2. In your project root run:
+
+  ```sh
+  composer require pauloamgomes/cockpitcms-moderation
+  ```
+
+---
 
 ## Configuration
 
@@ -22,6 +56,8 @@ on the addon settings page. You can use the moderation api key in your requests 
 ```
 http://your-cockpit-site/api/collections/get/<name>?token=<api-key>&previewToken=<moderation-api-key>
 ```
+
+Additional addon settings are available at: http://your-cockpit-site/settings/moderation
 
 ### Permissions
 

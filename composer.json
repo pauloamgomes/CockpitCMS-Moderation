@@ -1,0 +1,25 @@
+{
+    "name": "pauloamgomes/cockpitcms-moderation",
+    "description": "Moderation addon for Cockpit CMS, provides status capabilities (Unpublished, Draft or Published) for collections",
+    "keywords": ["cms", "headless", "api", "cockpit", "moderation-addon"],
+    "homepage": "https://github.com/pauloamgomes/CockpitCMS-Moderation",
+    "license": "MIT",
+    "type": "cockpit-module",
+    "authors": [
+        {
+            "name": "Paulo Gomes",
+            "email": "pauloamgomes@gmail.com",
+            "homepage": "https://www.pauloamgomes.net"
+        }
+    ],
+    "require": {
+      "php": ">= 7.3",
+      "composer/installers": "^1.10"
+    },
+    "suggest": {
+      "aheinze/cockpit": "Please install Cockpit before installing this addon"
+    },
+    "extra": {
+      "installer-name": "Moderation"
+    }
+}
