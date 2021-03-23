@@ -297,6 +297,9 @@
   }
 
   this.saveAndPublish = function(e) {
+    if (this.entry[$this.moderation_field] !== 'Published' && !this.entry['_publishedAt']) {
+      this.entry['_publishedAt'] = Math.round(+Date.now() / 1000);
+    }
     this.entry[$this.moderation_field] = 'Published';
     $this.update();
     this.submit(e);
