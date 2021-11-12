@@ -62,7 +62,7 @@
     </label>
     <div class="uk-margin-small-top">
       <span class="uk-badge uk-badge-outline">
-        {originalModeration[lang] !== entry[moderation_field] ? App.i18n.get("Change to:") : App.i18n.get("Save as:")} <strong>{App.i18n.get(entry[moderation_field])}</strong>
+        {originalModeration[localized ? lang : ''] !== entry[moderation_field] ? App.i18n.get("Change to:") : App.i18n.get("Save as:")} <strong>{App.i18n.get(entry[moderation_field])}</strong>
       </span>
     </div>
     <select bind="entry.{moderation_field}">
