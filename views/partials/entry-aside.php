@@ -134,15 +134,18 @@
     $this.localize = $this.field[0].localize || false;
     $this.moderation_field_name = $this.field[0].name;
     $this.moderation_field = getModerationField();
+    $this.autodraft = typeof $this.field[0].options.autodraft === "undefined" ? true : !!$this.field[0].options.autodraft;
+    var currentModeration = $this.entry[$this.moderation_field_name];
 
-    $this.originalModeration[''] = $this.entry[$this.moderation_field_name] || 'Draft';
-    if ($this.entry[$this.moderation_field_name] !== 'Unpublished') {
+    $this.originalModeration[''] = currentModeration || 'Draft';
+    if (currentModeration === null || ($this.autodraft && currentModeration !== 'Unpublished')) {
         $this.entry[$this.moderation_field_name] =  'Draft';
     }
     if ($this.localize) {
       for (var l of $this.languages) {
-        $this.originalModeration[l.code] = $this.entry[$this.moderation_field_name + "_" + l.code] || 'Draft';
-        if ($this.entry[$this.moderation_field_name + "_" + l.code] !== 'Unpublished') {
+        var currentLocalizedModeration = $this.entry[$this.moderation_field_name + "_" + l.code];
+        $this.originalModeration[l.code] = currentLocalizedModeration || 'Draft';
+        if (currentLocalizedModeration === null || ($this.autodraft && currentLocalizedModeration !== 'Unpublished')) {
           $this.entry[$this.moderation_field_name + "_" + l.code] = 'Draft';
         }
       }
@@ -153,7 +156,7 @@
       sidebar.insertBefore(document.querySelector('.moderation-status'), sidebar.childNodes[0]);
       App.$('cp-actionbar .uk-container button.uk-button-primary').attr('id', 'save-entry-button');
       App.$('cp-actionbar .uk-container').prepend(App.$('#save-and-publish'));
-      updateActions($this.entry[$this.moderation_field]);
+      updateActions($this.entry[$this.moderation_field], !$this.autodraft);
     }, 50);
 
     if (this.canSchedule && this.entry._id) {
@@ -185,8 +188,10 @@
       : $this.moderation_field_name;
   }
 
-  function updateActions(status) {
-    App.ui.notify(App.i18n.get('Entry moderation status changed to') + ' <strong>' + status + '</strong>', 'success');
+  function updateActions(status, silent = false) {
+    if(!silent) {
+      App.ui.notify(App.i18n.get('Entry moderation status changed to') + ' <strong>' + status + '</strong>', 'success');
+    }
     if (status === 'Draft') {
       App.$('#save-and-publish').show();
       App.$('#save-entry-button').removeClass('uk-button-danger uk-button-success').addClass('uk-button-primary').html(App.i18n.get('Save Draft')).show();
