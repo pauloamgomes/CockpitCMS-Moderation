@@ -197,14 +197,15 @@
     if(!silent) {
       App.ui.notify(App.i18n.get('Entry moderation status changed to') + ' <strong>' + status + '</strong>', 'success');
     }
+    App.$('#save-and-publish').hide();
     if (status === 'Draft') {
-      App.$('#save-and-publish').show();
+      if ($this.autodraft) {
+        App.$('#save-and-publish').show();
+      }
       App.$('#save-entry-button').removeClass('uk-button-danger uk-button-success').addClass('uk-button-primary').html(App.i18n.get('Save Draft')).show();
     } else if (status === 'Published') {
-      App.$('#save-and-publish').hide();
       App.$('#save-entry-button').removeClass('uk-button-primary uk-button-danger').addClass('uk-button-success').html(App.i18n.get('Save Published')).show();
     } else if (status === 'Unpublished') {
-      App.$('#save-and-publish').hide();
       App.$('#save-entry-button').removeClass('uk-button-primary uk-button-success').addClass('uk-button-danger').html(App.i18n.get('Save Unpublished')).show();
     }
   }
