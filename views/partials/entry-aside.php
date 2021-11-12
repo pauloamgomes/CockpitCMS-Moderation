@@ -55,10 +55,10 @@
   <label class="uk-text-small">@lang('Moderation')</label>
   <div class="uk-width-1-1 uk-form-select uk-moderation-element uk-moderation-{ entry[moderation_field] }">
     <label class="uk-text">
-      <i if="{originalModeration[lang] == 'Unpublished'}" class="icon-Unpublished uk-icon-circle-o"></i>
-      <i if="{originalModeration[lang] == 'Draft'}" class="icon-Draft uk-icon-pencil"></i>
-      <i if="{originalModeration[lang] == 'Published'}" class="icon-Published uk-icon-circle"></i>
-      <strong>@lang('Status:')</strong> {App.i18n.get(originalModeration[lang])}
+      <i if="{originalModeration[localized ? lang : ''] == 'Unpublished'}" class="icon-Unpublished uk-icon-circle-o"></i>
+      <i if="{originalModeration[localized ? lang : ''] == 'Draft'}" class="icon-Draft uk-icon-pencil"></i>
+      <i if="{originalModeration[localized ? lang : ''] == 'Published'}" class="icon-Published uk-icon-circle"></i>
+      <strong>@lang('Status:')</strong> {App.i18n.get(originalModeration[localized ? lang : ''])} <span if="{originalModeration[localized ? lang : ''] === 'Draft' && lastPublished}">({lastPublished})</span>
     </label>
     <div class="uk-margin-small-top">
       <span class="uk-badge uk-badge-outline">
@@ -97,6 +97,7 @@
   $this.canSchedule = {{ json_encode($enabled) }};
   $this.schedule = false;
   $this.langLabel = null;
+  $this.lastPublished = "";
 
   var oldXHROpen = window.XMLHttpRequest.prototype.open;
   window.XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
@@ -180,6 +181,10 @@
     if (this.entry._id && data[0] && data[1] && data[0] === 'entry.' + $this.moderation_field) {
       updateActions(data[1]);
     }
+    App.callmodule('moderation:getLastPublished', { id: $this.entry._id, collection: $this.collection.name, lang: $this.lang || "" }).then(function(data) {
+      $this.lastPublished = data.result;
+      $this.update();
+    });
   });
 
   function getModerationField() {
