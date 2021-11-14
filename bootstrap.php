@@ -138,6 +138,25 @@ $this->module('moderation')->extend([
     return $this->app->storage->remove('moderation/schedule', ['_oid' => $id, '_lang' => $lang]);
   },
 
+  'getLastPublished' => function (array $params) {
+    $revisions = $this->app->helper('revisions')->getList($params['id']);
+    if ($revisions) {
+      $moderationField = $this->getModerationField($params['collection']);
+      if ($moderationField) {
+        $field = $moderationField['name'];
+        if ($moderationField['localize'] && $params['lang']) {
+          $field .= "_{$params['lang']}";
+        }
+        foreach ($revisions as $revision) {
+          if ($revision['data'][$field] != "Draft") {
+            return $revision['data'][$field];
+          }
+        }
+      }
+    }
+    return "Unpublished";
+  },
+
 ]);
 
 // Incldude admin.

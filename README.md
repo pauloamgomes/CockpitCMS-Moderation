@@ -130,6 +130,11 @@ if you change the field later you may need to manually update all existing colle
 3. When editing an existing collection the moderation value will change automatically to `Draft`.
 4. When retrieving a collection entry (or list of entries) only entries with moderation value of `Published` or `Draft` (if there is a `Published` revision before the `Draft` one) will be returned.
 
+### Options
+The moderation field supports the following options:
+
+* `autodraft` (default: _true_) If set to _false_, entries that are being edited wont be set to `Draft`
+
 ### Localization
 
 The moderation fields supports localization as any other Cockpit field, just enable the localization option in the field configuration.

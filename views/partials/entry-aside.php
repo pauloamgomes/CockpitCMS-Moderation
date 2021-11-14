@@ -55,14 +55,14 @@
   <label class="uk-text-small">@lang('Moderation')</label>
   <div class="uk-width-1-1 uk-form-select uk-moderation-element uk-moderation-{ entry[moderation_field] }">
     <label class="uk-text">
-      <i if="{originalModeration[lang] == 'Unpublished'}" class="icon-Unpublished uk-icon-circle-o"></i>
-      <i if="{originalModeration[lang] == 'Draft'}" class="icon-Draft uk-icon-pencil"></i>
-      <i if="{originalModeration[lang] == 'Published'}" class="icon-Published uk-icon-circle"></i>
-      <strong>@lang('Status:')</strong> {App.i18n.get(originalModeration[lang])}
+      <i if="{originalModeration[localized ? lang : ''] == 'Unpublished'}" class="icon-Unpublished uk-icon-circle-o"></i>
+      <i if="{originalModeration[localized ? lang : ''] == 'Draft'}" class="icon-Draft uk-icon-pencil"></i>
+      <i if="{originalModeration[localized ? lang : ''] == 'Published'}" class="icon-Published uk-icon-circle"></i>
+      <strong>@lang('Status:')</strong> {App.i18n.get(originalModeration[localized ? lang : ''])} <span if="{originalModeration[localized ? lang : ''] === 'Draft' && lastPublished}">({lastPublished})</span>
     </label>
     <div class="uk-margin-small-top">
       <span class="uk-badge uk-badge-outline">
-        {originalModeration[lang] !== entry[moderation_field] ? App.i18n.get("Change to:") : App.i18n.get("Save as:")} <strong>{App.i18n.get(entry[moderation_field])}</strong>
+        {originalModeration[localized ? lang : ''] !== entry[moderation_field] ? App.i18n.get("Change to:") : App.i18n.get("Save as:")} <strong>{App.i18n.get(entry[moderation_field])}</strong>
       </span>
     </div>
     <select bind="entry.{moderation_field}">
@@ -97,6 +97,7 @@
   $this.canSchedule = {{ json_encode($enabled) }};
   $this.schedule = false;
   $this.langLabel = null;
+  $this.lastPublished = "";
 
   var oldXHROpen = window.XMLHttpRequest.prototype.open;
   window.XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
@@ -134,15 +135,18 @@
     $this.localize = $this.field[0].localize || false;
     $this.moderation_field_name = $this.field[0].name;
     $this.moderation_field = getModerationField();
+    $this.autodraft = typeof $this.field[0].options.autodraft === "undefined" ? true : !!$this.field[0].options.autodraft;
+    var currentModeration = $this.entry[$this.moderation_field_name];
 
-    $this.originalModeration[''] = $this.entry[$this.moderation_field_name] || 'Draft';
-    if ($this.entry[$this.moderation_field_name] !== 'Unpublished') {
+    $this.originalModeration[''] = currentModeration || 'Draft';
+    if (currentModeration === null || ($this.autodraft && currentModeration !== 'Unpublished')) {
         $this.entry[$this.moderation_field_name] =  'Draft';
     }
     if ($this.localize) {
       for (var l of $this.languages) {
-        $this.originalModeration[l.code] = $this.entry[$this.moderation_field_name + "_" + l.code] || 'Draft';
-        if ($this.entry[$this.moderation_field_name + "_" + l.code] !== 'Unpublished') {
+        var currentLocalizedModeration = $this.entry[$this.moderation_field_name + "_" + l.code];
+        $this.originalModeration[l.code] = currentLocalizedModeration || 'Draft';
+        if (currentLocalizedModeration === null || ($this.autodraft && currentLocalizedModeration !== 'Unpublished')) {
           $this.entry[$this.moderation_field_name + "_" + l.code] = 'Draft';
         }
       }
@@ -153,7 +157,7 @@
       sidebar.insertBefore(document.querySelector('.moderation-status'), sidebar.childNodes[0]);
       App.$('cp-actionbar .uk-container button.uk-button-primary').attr('id', 'save-entry-button');
       App.$('cp-actionbar .uk-container').prepend(App.$('#save-and-publish'));
-      updateActions($this.entry[$this.moderation_field]);
+      updateActions($this.entry[$this.moderation_field], !$this.autodraft);
     }, 50);
 
     if (this.canSchedule && this.entry._id) {
@@ -177,6 +181,10 @@
     if (this.entry._id && data[0] && data[1] && data[0] === 'entry.' + $this.moderation_field) {
       updateActions(data[1]);
     }
+    App.callmodule('moderation:getLastPublished', { id: $this.entry._id, collection: $this.collection.name, lang: $this.lang || "" }).then(function(data) {
+      $this.lastPublished = data.result;
+      $this.update();
+    });
   });
 
   function getModerationField() {
@@ -185,16 +193,19 @@
       : $this.moderation_field_name;
   }
 
-  function updateActions(status) {
-    App.ui.notify(App.i18n.get('Entry moderation status changed to') + ' <strong>' + status + '</strong>', 'success');
+  function updateActions(status, silent = false) {
+    if(!silent) {
+      App.ui.notify(App.i18n.get('Entry moderation status changed to') + ' <strong>' + status + '</strong>', 'success');
+    }
+    App.$('#save-and-publish').hide();
     if (status === 'Draft') {
-      App.$('#save-and-publish').show();
+      if ($this.autodraft) {
+        App.$('#save-and-publish').show();
+      }
       App.$('#save-entry-button').removeClass('uk-button-danger uk-button-success').addClass('uk-button-primary').html(App.i18n.get('Save Draft')).show();
     } else if (status === 'Published') {
-      App.$('#save-and-publish').hide();
       App.$('#save-entry-button').removeClass('uk-button-primary uk-button-danger').addClass('uk-button-success').html(App.i18n.get('Save Published')).show();
     } else if (status === 'Unpublished') {
-      App.$('#save-and-publish').hide();
       App.$('#save-entry-button').removeClass('uk-button-primary uk-button-success').addClass('uk-button-danger').html(App.i18n.get('Save Unpublished')).show();
     }
   }
