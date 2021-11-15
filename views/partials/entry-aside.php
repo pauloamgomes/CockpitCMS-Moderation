@@ -181,7 +181,7 @@
     if (this.entry._id && data[0] && data[1] && data[0] === 'entry.' + $this.moderation_field) {
       updateActions(data[1]);
     }
-    App.callmodule('moderation:getLastPublished', { id: $this.entry._id, collection: $this.collection.name, lang: $this.lang || "" }).then(function(data) {
+    App.callmodule('moderation:getLastPublishedStatus', { id: $this.entry._id, collection: $this.collection.name, lang: $this.lang || "" }).then(function(data) {
       $this.lastPublished = data.result;
       $this.update();
     });
