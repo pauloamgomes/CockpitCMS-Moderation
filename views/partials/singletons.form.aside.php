@@ -253,7 +253,7 @@
       singleton: this.singleton.name,
       lang: (this.localize && this.lang) || ""
     };
-    App.callmodule('moderation:setSingletonSchedule',  schedule, 'schedule').then(function(data) {
+    App.callmodule('moderation:setSchedule',  schedule, 'schedule').then(function(data) {
       App.ui.notify('Schedule: singleton will be <strong>' + $this.schedule.type + "</strong> on <strong>" + $this.schedule.date + " " + $this.schedule.time + '</strong>', 'success');
     }).catch(function(e){
       App.ui.notify('Error creating schedule!', 'danger');

@@ -143,7 +143,7 @@ $this->module('moderation')->extend([
     return $published;
   },
 
-  'setCollectionSchedule' => function(array $data) {
+  'setSchedule' => function(array $data) {
     $id = $data['id'];
     $lang = $data['lang'] ?? "";
 
@@ -151,40 +151,18 @@ $this->module('moderation')->extend([
 
     $existing = $this->app->storage->findOne('moderation/schedule', ['_oid' => $id, 'lang' => $lang]);
 
-    $entry = [
-      '_oid' => trim($id),
-      'schedule' => $data['schedule'],
-      '_field' => $data['field'],
-      '_collection' => $data['collection'],
-      '_lang' => trim($data['lang']),
-      '_creator' => $user['_id'] ?? NULL,
-      '_modified' => time()
-    ];
-
-    if ($existing) {
-      $entry['_id'] = $existing['_id'];
-      $this->app->storage->save('moderation/schedule', $entry);
+    if (isset($data['collection']) {
+        $scheduleData = $data['collection']
     }
     else {
-      $this->app->storage->insert('moderation/schedule', $entry);
+        $scheduleData = $data['singleton']
     }
-
-    return $entry;
-  },
-
-  'setSingletonSchedule' => function(array $data) {
-    $id = $data['id'];
-    $lang = $data['lang'] ?? "";
-
-    $user = $this->app->module('cockpit')->getUser();
-
-    $existing = $this->app->storage->findOne('moderation/schedule', ['_oid' => $id, 'lang' => $lang]);
 
     $entry = [
       '_oid' => trim($id),
       'schedule' => $data['schedule'],
       '_field' => $data['field'],
-      '_singleton' => $data['singleton'],
+      '_collection' => $scheduleData,
       '_lang' => trim($data['lang']),
       '_creator' => $user['_id'] ?? NULL,
       '_modified' => time()
