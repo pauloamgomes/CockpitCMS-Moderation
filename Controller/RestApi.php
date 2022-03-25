@@ -1,4 +1,4 @@
-<?php
+ <?php
 
 namespace Moderation\Controller;
 
@@ -15,7 +15,7 @@ class RestApi extends Controller {
   ];
 
   /**
-   * Run schedulling.
+   * Run scheduling.
    */
   public function list() {
     $range = $this->param('range', 10);
@@ -45,7 +45,7 @@ class RestApi extends Controller {
   }
 
   /**
-   * Run schedulling.
+   * Run scheduling.
    */
   public function run() {
     $results = $this->list();

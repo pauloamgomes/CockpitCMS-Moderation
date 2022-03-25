@@ -181,7 +181,7 @@
     if (this.entry._id && data[0] && data[1] && data[0] === 'entry.' + $this.moderation_field) {
       updateActions(data[1]);
     }
-    App.callmodule('moderation:getLastPublishedStatus', { id: $this.entry._id, collection: $this.collection.name, lang: $this.lang || "" }).then(function(data) {
+    App.callmodule('moderation:getCollectionLastPublishedStatus', { id: $this.entry._id, collection: $this.collection.name, lang: $this.lang || "" }).then(function(data) {
       $this.lastPublished = data.result;
       $this.update();
     });
@@ -253,7 +253,7 @@
       collection: this.collection.name,
       lang: (this.localize && this.lang) || ""
     };
-    App.callmodule('moderation:setSchedule',  schedule, 'schedule').then(function(data) {
+    App.callmodule('moderation:setCollectionSchedule',  schedule, 'schedule').then(function(data) {
       App.ui.notify('Schedule: entry will be <strong>' + $this.schedule.type + "</strong> on <strong>" + $this.schedule.date + " " + $this.schedule.time + '</strong>', 'success');
     }).catch(function(e){
       App.ui.notify('Error creating schedule!', 'danger');

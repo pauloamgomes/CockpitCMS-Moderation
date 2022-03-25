@@ -15,8 +15,8 @@
  */
 $this->module('moderation')->extend([
 
-  'getLastPublished' => function ($id, $moderation_field, array $revisions = []) {
-    $revisons = array_reverse($revisions);
+  'getLastPublished' => function ($moderation_field, array $revisions = []) {
+    $revisions = array_reverse($revisions);
 
     foreach ($revisions as $revision) {
 
@@ -44,10 +44,22 @@ $this->module('moderation')->extend([
     return FALSE;
   },
 
-  'getModerationField' => function($name) {
+  'getCollectionModerationField' => function($name) {
     $collection = $this->app->module('collections')->collection($name);
     if ($collection && !empty($collection['fields'])) {
       foreach ($collection['fields'] as $field) {
+        if ($field['type'] === 'moderation') {
+          return $field;
+        }
+      }
+    }
+    return FALSE;
+  },
+
+  'getSingletonModerationField' => function($name) {
+    $singleton = $this->app->module('singletons')->singleton($name);
+    if ($singleton && !empty($singleton['fields'])) {
+      foreach ($singleton['fields'] as $field) {
         if ($field['type'] === 'moderation') {
           return $field;
         }
@@ -63,7 +75,7 @@ $this->module('moderation')->extend([
     return ['success' => $this->app->module('cockpit')->saveApiKeys($keys)];
   },
 
-  'removeLangSuffix' => function($name, $entry, $lang, $ignoreDefaultFallback) {
+  'removeCollectionLangSuffix' => function($name, $entry, $lang, $ignoreDefaultFallback) {
     if ($lang) {
 
       $collection = $this->app->module('collections')->collection($name);
@@ -98,7 +110,40 @@ $this->module('moderation')->extend([
     return $entry;
   },
 
-  'setSchedule' => function(array $data) {
+  'removeSingletonLangSuffix' => function($singleton, $published, $lang, $ignoreDefaultFallback) {
+    if ($lang) {
+
+      foreach ($singleton['fields'] as $field) {
+
+        if ($field['localize']) {
+          $fieldName = $field['name'];
+          $suffixedFieldName = $fieldName."_$lang";
+
+          if (
+            isset($published[$suffixedFieldName]) &&
+            $published[$suffixedFieldName] !== ''
+          ) {
+            $published[$fieldName] = $published[$suffixedFieldName];
+
+            if (isset($published["{$suffixedFieldName}_slug"]) && $published["{$suffixedFieldName}_slug"] !== '') {
+              $published["{$fieldName}_slug"] = $published["{$suffixedFieldName}_slug"];
+            }
+          } elseif (
+            $ignoreDefaultFallback === true ||
+            (
+              is_array($ignoreDefaultFallback) &&
+              in_array($fieldName, $ignoreDefaultFallback)
+            )
+          ) {
+            $published[$fieldName] = null;
+          }
+        }
+      }
+    }
+    return $published;
+  },
+
+  'setCollectionSchedule' => function(array $data) {
     $id = $data['id'];
     $lang = $data['lang'] ?? "";
 
@@ -127,6 +172,35 @@ $this->module('moderation')->extend([
     return $entry;
   },
 
+  'setSingletonSchedule' => function(array $data) {
+    $id = $data['id'];
+    $lang = $data['lang'] ?? "";
+
+    $user = $this->app->module('cockpit')->getUser();
+
+    $existing = $this->app->storage->findOne('moderation/schedule', ['_oid' => $id, 'lang' => $lang]);
+
+    $entry = [
+      '_oid' => trim($id),
+      'schedule' => $data['schedule'],
+      '_field' => $data['field'],
+      '_singleton' => $data['singleton'],
+      '_lang' => trim($data['lang']),
+      '_creator' => $user['_id'] ?? NULL,
+      '_modified' => time()
+    ];
+
+    if ($existing) {
+      $entry['_id'] = $existing['_id'];
+      $this->app->storage->save('moderation/schedule', $entry);
+    }
+    else {
+      $this->app->storage->insert('moderation/schedule', $entry);
+    }
+
+    return $entry;
+  },
+
   'getSchedule' => function(array $data) {
     $filter = ['_oid' => $data['id'], '_lang' => $data['lang']];
     return $this->app->storage->findOne('moderation/schedule', $filter);
@@ -138,10 +212,29 @@ $this->module('moderation')->extend([
     return $this->app->storage->remove('moderation/schedule', ['_oid' => $id, '_lang' => $lang]);
   },
 
-  'getLastPublishedStatus' => function (array $params) {
+  'getCollectionLastPublishedStatus' => function (array $params) {
     $revisions = $this->app->helper('revisions')->getList($params['id']);
     if ($revisions) {
-      $moderationField = $this->getModerationField($params['collection']);
+      $moderationField = $this->getCollectionModerationField($params['collection']);
+      if ($moderationField) {
+        $field = $moderationField['name'];
+        if ($moderationField['localize'] && $params['lang']) {
+          $field .= "_{$params['lang']}";
+        }
+        foreach ($revisions as $revision) {
+          if ($revision['data'][$field] != "Draft") {
+            return $revision['data'][$field];
+          }
+        }
+      }
+    }
+    return "Unpublished";
+  },
+
+  'getSingletonLastPublishedStatus' => function (array $params) {
+    $revisions = $this->app->helper('revisions')->getList($params['id']);
+    if ($revisions) {
+      $moderationField = $this->getSingletonModerationField($params['singleton']);
       if ($moderationField) {
         $field = $moderationField['name'];
         if ($moderationField['localize'] && $params['lang']) {
@@ -159,7 +252,7 @@ $this->module('moderation')->extend([
 
 ]);
 
-// Incldude admin.
+// Include admin.
 if (COCKPIT_ADMIN && !COCKPIT_API_REQUEST) {
   include_once __DIR__ . '/admin.php';
 }
