@@ -1,9 +1,9 @@
 # Cockpit CMS Moderation Add-on
 
-This addon extends Cockpit CMS core functionality by introducing the possibility to have moderation of collections. It means that its possible to create collections with a status (Unpublished, Draft or Published) affecting the way that entries are retrieved:
+This addon extends Cockpit CMS core functionality by introducing the possibility to have moderation of collections and singletons. It means that its possible to create collections and singletons with a status (Unpublished, Draft or Published) affecting the way that entries are retrieved:
 
-- **Unpublished** - Any collection entry in unpublished state will be filtered out.
-- **Draft** - Any collection entry in Draft that doesn't have a previous revision in published status will be also filtered out. If there is a previous revision with published status the revision will be returned instead. However on a scenario that we have a published > unpublished > draft sequence no entry will be returned.
+- **Unpublished** - Any collection entry or singleton in unpublished state will be filtered out.
+- **Draft** - Any collection entry or singleton in Draft that doesn't have a previous revision in published status will be also filtered out. If there is a previous revision with published status the revision will be returned instead. However on a scenario that we have a published > unpublished > draft sequence no entry will be returned.
 - **Published** - They are always returned.
 
 ## Installation
