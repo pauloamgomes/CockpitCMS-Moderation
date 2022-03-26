@@ -152,17 +152,19 @@ $this->module('moderation')->extend([
     $existing = $this->app->storage->findOne('moderation/schedule', ['_oid' => $id, 'lang' => $lang]);
 
     if (isset($data['collection']) {
-        $scheduleData = $data['collection']
+        $type = '_collection';
+        $scheduleData = $data['collection'];
     }
     else {
-        $scheduleData = $data['singleton']
+        $type = '_singleton';
+        $scheduleData = $data['singleton'];
     }
 
     $entry = [
       '_oid' => trim($id),
       'schedule' => $data['schedule'],
       '_field' => $data['field'],
-      '_collection' => $scheduleData,
+      $type => $scheduleData,
       '_lang' => trim($data['lang']),
       '_creator' => $user['_id'] ?? NULL,
       '_modified' => time()
