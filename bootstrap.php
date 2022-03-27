@@ -44,22 +44,15 @@ $this->module('moderation')->extend([
     return FALSE;
   },
 
-  'getCollectionModerationField' => function($name) {
-    $collection = $this->app->module('collections')->collection($name);
+  'getModerationField' => function($type, $name) {
+    if ($type === "collection") {
+      $entry = $this->app->module('collections')->collection($name);
+    }
+    else {
+      $entry = $this->app->module('singletons')->singleton($name);
+    }
     if ($collection && !empty($collection['fields'])) {
       foreach ($collection['fields'] as $field) {
-        if ($field['type'] === 'moderation') {
-          return $field;
-        }
-      }
-    }
-    return FALSE;
-  },
-
-  'getSingletonModerationField' => function($name) {
-    $singleton = $this->app->module('singletons')->singleton($name);
-    if ($singleton && !empty($singleton['fields'])) {
-      foreach ($singleton['fields'] as $field) {
         if ($field['type'] === 'moderation') {
           return $field;
         }
@@ -192,29 +185,15 @@ $this->module('moderation')->extend([
     return $this->app->storage->remove('moderation/schedule', ['_oid' => $id, '_lang' => $lang]);
   },
 
-  'getCollectionLastPublishedStatus' => function (array $params) {
+  'getLastPublishedStatus' => function (array $params) {
     $revisions = $this->app->helper('revisions')->getList($params['id']);
     if ($revisions) {
-      $moderationField = $this->getCollectionModerationField($params['collection']);
-      if ($moderationField) {
-        $field = $moderationField['name'];
-        if ($moderationField['localize'] && $params['lang']) {
-          $field .= "_{$params['lang']}";
-        }
-        foreach ($revisions as $revision) {
-          if ($revision['data'][$field] != "Draft") {
-            return $revision['data'][$field];
-          }
-        }
+      if (isset($params['collection'])) {
+        $moderationField = $this->getModerationField('collection', $params['collection']);
       }
-    }
-    return "Unpublished";
-  },
-
-  'getSingletonLastPublishedStatus' => function (array $params) {
-    $revisions = $this->app->helper('revisions')->getList($params['id']);
-    if ($revisions) {
-      $moderationField = $this->getSingletonModerationField($params['singleton']);
+      else {
+        $moderationField = $this->getModerationField('singleton', $params['singleton']);
+      }
       if ($moderationField) {
         $field = $moderationField['name'];
         if ($moderationField['localize'] && $params['lang']) {

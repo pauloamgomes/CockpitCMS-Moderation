@@ -50,7 +50,7 @@ $app->on('collections.find.after', function ($name, &$entries) use ($app) {
   }
 
   // Get the moderation field.
-  $field = $app->module('moderation')->getCollectionModerationField($name);
+  $field = $app->module('moderation')->getModerationField('collection', $name);
 
   if (!$field) {
     return;
@@ -142,7 +142,7 @@ $app->on('singleton.getData.after', function ($singleton, &$data) use ($app) {
   }
 
   // Get the moderation field.
-  $field = $app->module('moderation')->getSingletonModerationField($singleton['name']);
+  $field = $app->module('moderation')->getModerationField('singleton', $singleton['name']);
 
   if (!$field) {
     return;

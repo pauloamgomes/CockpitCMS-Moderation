@@ -181,7 +181,7 @@
     if (this.singleton._id && data[0] && data[1] && data[0] === 'data.' + $this.moderation_field) {
       updateActions(data[1]);
     }
-    App.callmodule('moderation:getSingletonLastPublishedStatus', { id: $this.singleton._id, singleton: $this.singleton.name, lang: $this.lang || "" }).then(function(data) {
+    App.callmodule('moderation:getLastPublishedStatus', { id: $this.singleton._id, singleton: $this.singleton.name, lang: $this.lang || "" }).then(function(data) {
       $this.lastPublished = data.result;
       $this.update();
     });
