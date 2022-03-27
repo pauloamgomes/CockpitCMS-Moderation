@@ -233,7 +233,7 @@
       id: this.singleton._id,
       lang: (this.localize && this.lang) || ""
     };
-    App.callmodule('moderation:getSingletonSchedule', filter, 'schedule').then(function(data) {
+    App.callmodule('moderation:getSchedule', filter, 'schedule').then(function(data) {
       $this.schedule = (data.result && utcScheduleToLocal(data.result.schedule)) || null;
       $this.update();
     }).catch(function(e){
