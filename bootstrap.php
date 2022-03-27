@@ -144,7 +144,7 @@ $this->module('moderation')->extend([
 
     $existing = $this->app->storage->findOne('moderation/schedule', ['_oid' => $id, 'lang' => $lang]);
 
-    if (isset($data['collection']) {
+    if (isset($data['collection'])) {
         $type = '_collection';
         $scheduleData = $data['collection'];
     }
