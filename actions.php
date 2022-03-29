@@ -82,7 +82,7 @@ $app->on('collections.find.after', function ($name, &$entries) use ($app) {
       $published = $app->module('moderation')->getLastPublished($moderation_field, $revisions);
 
       if ($published) {
-        $published = $app->module('moderation')->removeCollectionLangSuffix($name, $published, $lang, $ignoreDefaultFallback);
+        $published = $app->module('moderation')->removeLangSuffix('collection', $name, $published, $lang, $ignoreDefaultFallback);
         $published = array_merge($entry, array_intersect_key($published, $entry));
         $published = [$published];
         $populated = cockpit_populate_collection($published, $populate);
@@ -173,7 +173,7 @@ $app->on('singleton.getData.after', function ($singleton, &$data) use ($app) {
     $published = $app->module('moderation')->getLastPublished($moderation_field, $revisions);
 
     if ($published) {
-      $published = $app->module('moderation')->removeSingletonLangSuffix($singleton, $published, $lang, $ignoreDefaultFallback);
+      $published = $app->module('moderation')->removeLangSuffix('singleton', $singleton, $published, $lang, $ignoreDefaultFallback);
       $published = array_merge($data, array_intersect_key($published, $data));
       $published = [$published];
       $populated = cockpit_populate_collection($published, $populate);

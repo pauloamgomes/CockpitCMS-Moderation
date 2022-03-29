@@ -51,8 +51,8 @@ $this->module('moderation')->extend([
     else {
       $entry = $this->app->module('singletons')->singleton($name);
     }
-    if ($collection && !empty($collection['fields'])) {
-      foreach ($collection['fields'] as $field) {
+    if ($entry && !empty($entry['fields'])) {
+      foreach ($entry['fields'] as $field) {
         if ($field['type'] === 'moderation') {
           return $field;
         }
@@ -68,13 +68,13 @@ $this->module('moderation')->extend([
     return ['success' => $this->app->module('cockpit')->saveApiKeys($keys)];
   },
 
-  'removeCollectionLangSuffix' => function($name, $entry, $lang, $ignoreDefaultFallback) {
+  'removeLangSuffix' => function($type, $data, $entry, $lang, $ignoreDefaultFallback) {
     if ($lang) {
+      if ($type === 'collection') {
+        $data = $this->app->module('collections')->collection($data);
+      }
 
-      $collection = $this->app->module('collections')->collection($name);
-
-      foreach ($collection['fields'] as $field) {
-
+      foreach ($data['fields'] as $field) {
         if ($field['localize']) {
           $fieldName = $field['name'];
           $suffixedFieldName = $fieldName."_$lang";
@@ -101,39 +101,6 @@ $this->module('moderation')->extend([
       }
     }
     return $entry;
-  },
-
-  'removeSingletonLangSuffix' => function($singleton, $published, $lang, $ignoreDefaultFallback) {
-    if ($lang) {
-
-      foreach ($singleton['fields'] as $field) {
-
-        if ($field['localize']) {
-          $fieldName = $field['name'];
-          $suffixedFieldName = $fieldName."_$lang";
-
-          if (
-            isset($published[$suffixedFieldName]) &&
-            $published[$suffixedFieldName] !== ''
-          ) {
-            $published[$fieldName] = $published[$suffixedFieldName];
-
-            if (isset($published["{$suffixedFieldName}_slug"]) && $published["{$suffixedFieldName}_slug"] !== '') {
-              $published["{$fieldName}_slug"] = $published["{$suffixedFieldName}_slug"];
-            }
-          } elseif (
-            $ignoreDefaultFallback === true ||
-            (
-              is_array($ignoreDefaultFallback) &&
-              in_array($fieldName, $ignoreDefaultFallback)
-            )
-          ) {
-            $published[$fieldName] = null;
-          }
-        }
-      }
-    }
-    return $published;
   },
 
   'setSchedule' => function(array $data) {
