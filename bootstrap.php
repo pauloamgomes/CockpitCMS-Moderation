@@ -15,8 +15,8 @@
  */
 $this->module('moderation')->extend([
 
-  'getLastPublished' => function ($id, $moderation_field, array $revisions = []) {
-    $revisons = array_reverse($revisions);
+  'getLastPublished' => function ($moderation_field, array $revisions = []) {
+    $revisions = array_reverse($revisions);
 
     foreach ($revisions as $revision) {
 
@@ -44,10 +44,15 @@ $this->module('moderation')->extend([
     return FALSE;
   },
 
-  'getModerationField' => function($name) {
-    $collection = $this->app->module('collections')->collection($name);
-    if ($collection && !empty($collection['fields'])) {
-      foreach ($collection['fields'] as $field) {
+  'getModerationField' => function($type, $name) {
+    if ($type === "collection") {
+      $entry = $this->app->module('collections')->collection($name);
+    }
+    else {
+      $entry = $this->app->module('singletons')->singleton($name);
+    }
+    if ($entry && !empty($entry['fields'])) {
+      foreach ($entry['fields'] as $field) {
         if ($field['type'] === 'moderation') {
           return $field;
         }
@@ -63,13 +68,13 @@ $this->module('moderation')->extend([
     return ['success' => $this->app->module('cockpit')->saveApiKeys($keys)];
   },
 
-  'removeLangSuffix' => function($name, $entry, $lang, $ignoreDefaultFallback) {
+  'removeLangSuffix' => function($type, $data, $entry, $lang, $ignoreDefaultFallback) {
     if ($lang) {
+      if ($type === 'collection') {
+        $data = $this->app->module('collections')->collection($data);
+      }
 
-      $collection = $this->app->module('collections')->collection($name);
-
-      foreach ($collection['fields'] as $field) {
-
+      foreach ($data['fields'] as $field) {
         if ($field['localize']) {
           $fieldName = $field['name'];
           $suffixedFieldName = $fieldName."_$lang";
@@ -106,11 +111,20 @@ $this->module('moderation')->extend([
 
     $existing = $this->app->storage->findOne('moderation/schedule', ['_oid' => $id, 'lang' => $lang]);
 
+    if (isset($data['collection'])) {
+        $type = '_collection';
+        $scheduleData = $data['collection'];
+    }
+    else {
+        $type = '_singleton';
+        $scheduleData = $data['singleton'];
+    }
+
     $entry = [
       '_oid' => trim($id),
       'schedule' => $data['schedule'],
       '_field' => $data['field'],
-      '_collection' => $data['collection'],
+      $type => $scheduleData,
       '_lang' => trim($data['lang']),
       '_creator' => $user['_id'] ?? NULL,
       '_modified' => time()
@@ -141,7 +155,12 @@ $this->module('moderation')->extend([
   'getLastPublishedStatus' => function (array $params) {
     $revisions = $this->app->helper('revisions')->getList($params['id']);
     if ($revisions) {
-      $moderationField = $this->getModerationField($params['collection']);
+      if (isset($params['collection'])) {
+        $moderationField = $this->getModerationField('collection', $params['collection']);
+      }
+      else {
+        $moderationField = $this->getModerationField('singleton', $params['singleton']);
+      }
       if ($moderationField) {
         $field = $moderationField['name'];
         if ($moderationField['localize'] && $params['lang']) {
@@ -159,7 +178,7 @@ $this->module('moderation')->extend([
 
 ]);
 
-// Incldude admin.
+// Include admin.
 if (COCKPIT_ADMIN && !COCKPIT_API_REQUEST) {
   include_once __DIR__ . '/admin.php';
 }

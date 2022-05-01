@@ -1,4 +1,4 @@
-<?php
+ <?php
 
 namespace Moderation\Controller;
 
@@ -15,7 +15,7 @@ class RestApi extends Controller {
   ];
 
   /**
-   * Run schedulling.
+   * Run scheduling.
    */
   public function list() {
     $range = $this->param('range', 10);
@@ -45,24 +45,36 @@ class RestApi extends Controller {
   }
 
   /**
-   * Run schedulling.
+   * Run scheduling.
    */
   public function run() {
     $results = $this->list();
     $processed = [];
-    $collections = [];
+    $data = [];
     $entries = [];
-    foreach ($results['active'] as $data) {
-      $type = $data['schedule']['type'];
-      if (!isset($collections[$data['_collection']])) {
-        $collection = $this->app->module('collections')->collection($data['_collection']);
-        $collections[$data['_collection']] = $collection;
+    foreach ($results['active'] as $result) {
+      $type = $result['schedule']['type'];
+      if (isset($result['_collection'])) {
+        if (isset($data[$result['_collection']])) {
+          $item = $data[$result['_collection']];
+        }
+        else {
+          $item = $this->app->module('collections')->collection($result['_collection']);
+          $data[$result['_collection']] = $item;
+        }
+        $entry = (array) $this->app->storage->findOne("collections/{$item['_id']}", ['_id' => $result['_oid']]);
       }
       else {
-        $collection = $collections[$data['_collection']];
+        if (isset($data[$result['_singleton']])) {
+          $item = $data[$result['_singleton']];
+        }
+        else {
+          $item = $this->app->module('singletons')->singleton($result['_singleton']);
+          $data[$result['_singleton']] = $item;
+        }
+        $entry = (array) $this->app->storage->findOne('singletons', ['filter' => ['_id' => $result['_oid']]);
       }
 
-      $entry = (array) $this->app->storage->findOne("collections/{$collection['_id']}", ['_id' => $data['_oid']]);
       $field = $data['_field'];
       if ($data['_lang']) {
         $field .= "_{$data['_lang']}";
@@ -70,13 +82,18 @@ class RestApi extends Controller {
       if (isset($entry[$field]) && isset($this->moderation[$type])) {
         $old_status = $entry[$field];
         $entry[$field] = $this->moderation[$type];
-        $this->app->module('collections')->save($data['_collection'], $entry, ['revision' => TRUE]);
-        $this->app->storage->remove('moderation/schedule', ['_id' => $data['_id']]);
+        if (isset($result['_collection'])) {
+          $this->app->module('collections')->save($result['_collection'], $entry, ['revision' => TRUE]);
+        }
+        else {
+          $this->app->module('singletons')->saveData($result['_singleton'], $entry, ['revision' => TRUE]);
+        }
+        $this->app->storage->remove('moderation/schedule', ['_id' => $result['_id']]);
         $processed[] = [
           '_id' => $entry['_id'],
           'old_status' => $old_status,
           'new_status' => $entry[$field],
-          'schedule_data' => $data,
+          'schedule_data' => $result,
         ];
       }
     }
